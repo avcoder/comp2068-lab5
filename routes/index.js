@@ -9,7 +9,8 @@ const router = express.Router();
 router.get('/', gameController.homePage);
 
 router.get('/games', gameController.getGames);
-router.get('/filldata', authController.isLoggedIn, gameController.fillData);
+// router.get('/filldata', authController.isLoggedIn, gameController.fillData);
+router.get('/filldata', gameController.fillData);
 router.get('/playgame', authController.isLoggedIn, gameController.play);
 
 router.get('/admin', authController.isLoggedIn, gameController.admin);
@@ -18,7 +19,8 @@ router.get('/admin/edit/:id', gameController.editGame);
 router.post('/admin/edit/:id', gameController.updateGame);
 
 router.get('/add', authController.isLoggedIn, gameController.addGame);
-router.post('/add', authController.isLoggedIn, gameController.createGame);
+// router.post('/add', authController.isLoggedIn, gameController.createGame);
+router.post('/add', gameController.createGame);
 
 router.get('/register', userController.registerForm);
 router.post('/register', userController.register, authController.login);

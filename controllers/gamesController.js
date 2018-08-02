@@ -8,13 +8,9 @@ exports.homePage = (req, res) => {
 exports.getGames = (req, res) => {
   Game.find((err, games) => {
     if (err) {
-      res.render('error');
+      res.json(err);
     } else {
-      res.render('games', {
-        title: 'All Games',
-        games,
-        user: req.user,
-      });
+      res.json({ title: 'All Games', games });
     }
   });
 };
@@ -52,8 +48,13 @@ exports.fillData = (req, res) => {
     },
   ];
 
-  Game.collection.insertMany(data);
-  res.redirect('/admin');
+  Game.collection.insertMany(data, (err, allGames) => {
+    if (err) {
+      res.json({ success: false, msg: 'Failed to sample games' });
+    } else {
+      res.json(allGames);
+    }
+  });
 };
 
 exports.addGame = (req, res) => {
@@ -67,9 +68,9 @@ exports.createGame = async (req, res) => {
   try {
     const game = new Game(req.body);
     await game.save();
-    res.redirect('/games');
+    res.json(game);
   } catch (err) {
-    console.log(err);
+    res.json({ success: false, msg: 'Unable to add game' });
   }
 };
 
@@ -86,9 +87,9 @@ exports.deleteGame = (req, res) => {
     { _id: req.params.id },
     async (err, gameJustDeleted) => {
       if (err) {
-        console.log(err);
+        res.json({ success: false, msg: 'Game not deleted' });
       } else {
-        res.redirect('/admin');
+        res.json({ success: true, msg: 'Game deleted' });
       }
     },
   );
@@ -98,14 +99,9 @@ exports.editGame = (req, res) => {
   // use Game model to find selected document
   Game.findById({ _id: req.params.id }, (err, game) => {
     if (err) {
-      console.log(err);
+      res.json({ success: false, msg: 'Unable to find game to edit' });
     } else {
-      res.render('editGame', {
-        title: 'Edit',
-        game,
-        isActive: 'admin',
-        user: req.user,
-      });
+      res.json({ success: true, msg: 'Found game to edit', game });
     }
   });
 };
@@ -116,9 +112,9 @@ exports.updateGame = (req, res) => {
 
   Game.update({ _id: req.params.id }, req.body, (err) => {
     if (err) {
-      console.log(err);
+      res.json({ success: false, msg: 'Unable to update game' });
     } else {
-      res.redirect('/admin');
+      res.json({ success: true, msg: 'Updated game' });
     }
   });
 };
